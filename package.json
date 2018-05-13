@@ -1,6 +1,6 @@
 {
   "name": "schema-magic",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "JSON Schema Utilities",
   "author": {
     "name": "Martin Naude",

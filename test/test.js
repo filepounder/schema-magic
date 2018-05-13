@@ -262,7 +262,7 @@ describe('Schema Magic', function() {
             let output="CREATE TABLE [dbo].[Table1](\r\n" +
                 "[Val1] varchar(255) NOT NULL,\r\n" +
                 "[Val2] int NOT NULL,\r\n" +
-                "[Val3] varchar(255) NULL,\r\n" +
+                "[Val3] datetime NULL,\r\n" +
                 "[Val4] varchar(255) NULL,\r\n" +
                 "[Val5] bit NULL);";
 
@@ -290,7 +290,7 @@ describe('Schema Magic', function() {
 
             let output="CREATE TABLE [dbo].[Test Table](\r\n" +
                 "[val1] varchar(255) NOT NULL,\r\n" +
-                "[val2_val3] varchar(255) NOT NULL,\r\n" +
+                "[val2_val3] datetime NOT NULL,\r\n" +
                 "[val2_val4] varchar(255) NULL,\r\n" +
                 "[val2_val5] bit NULL);";
 
