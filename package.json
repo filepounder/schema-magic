@@ -1,6 +1,6 @@
 {
   "name": "schema-magic",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "JSON Schema Utilities",
   "author": {
     "name": "Martin Naude",
@@ -11,6 +11,7 @@
     "deepcopy": "0.6.3",
     "json-magic": "0.0.5",
     "type-magic": "0.0.1",
+    "underscore": "1.9.0",
     "underscore.string": "3.3.4"
   },
   "engines": {

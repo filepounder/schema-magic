@@ -297,4 +297,412 @@ describe('Schema Magic', function() {
             assert.deepEqual(SchemaMagic.generateSQLTable(schema,"Test Table",{beautify:false}),output,"Invalid result")
         });
     });
+
+    describe('JSON Generate', function() {
+        
+
+        it('generate a simple schema', function () {
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON(null),{type:"null"},"Invalid schema generate");
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON("abc"),{type:"string"},"Invalid schema generate");
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON(1),{type:"integer"},"Invalid schema generate");
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON(new Date()),{type:"string",format:"date-time"},"Invalid schema generate");
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON(1.2),{type:"number"},"Invalid schema generate");
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON(false),{type:"boolean"},"Invalid schema generate");
+        });
+
+        it('generate a complex schema', function () {
+            let obj={
+                "id": 2,
+                "name": "An ice sculpture",
+                "price": 12.50,
+                "tags": ["cold", "ice"],
+                "dimensions": {
+                    "length": 7.0,
+                    "width": 12.0,
+                    "height": 9.5
+                },
+                "warehouseLocation": {
+                    "latitude": -78.75,
+                    "longitude": 20.4
+                }
+            };
+
+            let obj2= {
+                "id": 3,
+                "name": "A blue mouse",
+                "price": 25.50,
+                "dimensions": {
+                    "length": 3.1,
+                    "width": 1.0,
+                    "height": 1.0
+                },
+                "warehouseLocation": {
+                    "latitude": 54.4,
+                    "longitude": -32.7
+                }
+            };
+
+            let result={
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "dimensions": {
+                        "type": "object",
+                        "properties": {
+                            "length": {
+                                "type": "number"
+                            },
+                            "width": {
+                                "type": "integer"
+                            },
+                            "height": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "warehouseLocation": {
+                        "type": "object",
+                        "properties": {
+                            "latitude": {
+                                "type": "number"
+                            },
+                            "longitude": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+
+            };
+
+            let x=SchemaMagic.generateSchemaFromJSON(obj);
+            let y=SchemaMagic.generateSchemaFromJSON(obj2);
+            assert.deepEqual(SchemaMagic.mergeSchemas([x,y]), result, "Invalid schema generate");
+        });
+    });
+
+    describe('Merge Schemas', function() {
+
+        it('should merge a singel schema', function () {
+            let schemas=[
+                {type:"string"}
+            ];
+
+            let result={
+                type:"string"
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge a null schema', function () {
+            let schemas=[
+                {type:"string"},
+                null
+            ];
+
+            let result={
+                type:"string"
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge a no schema', function () {
+            let schemas=[ ];
+
+            let result=null;
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge a simple schema 1', function () {
+            let schemas=[
+                {type:"string"},
+                {type:"string"}
+            ];
+
+            let result={
+                type:"string"
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge a simple schema 2', function () {
+            let schemas=[
+                {type:"string"},
+                {type:"integer"}
+            ];
+
+            let result={
+                type:["string","integer"]
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge an object schema 1', function () {
+            let schemas=[
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"}
+                    }
+                },
+                {
+                    type:"object",
+                    properties:{
+                        val2:{type:"integer"}
+                    }
+                }
+            ];
+
+            let result={
+                type:"object",
+                properties:{
+                    val1:{type:"string"},
+                    val2:{type:"integer"}
+                }
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge an object schema 2', function () {
+            let schemas=[
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"}
+                    }
+                },
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"},
+                        val2:{type:"integer"}
+                    }
+                }
+            ];
+
+            let result={
+                type:"object",
+                properties:{
+                    val1:{type:"string"},
+                    val2:{type:"integer"}
+                }
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge an object schema 3', function () {
+            let schemas=[
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:["string"]}
+                    }
+                },
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"integer"},
+                        val2:{type:"integer"}
+                    }
+                }
+            ];
+
+            let result={
+                type:"object",
+                properties:{
+                    val1:{type:["string","integer"]},
+                    val2:{type:"integer"}
+                }
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge a simple schema with numbers', function () {
+            let schemas=[
+                {type:"integer"},
+                {type:"number"}
+            ];
+
+            let result={
+                type:"number"
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge equal', function () {
+            let schemas=[
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"},
+                        val2:{
+                            type:"array",
+                            items:{
+                                type:"string"}
+                        },
+                        val3:{
+                            type:"object",
+                            properties:{
+                                val4:{type:"string",format:"date-time"}  ,
+                                val5:{type:"number"}
+                            }
+                        }
+                    }
+                },
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"},
+                        val2:{
+                            type:"array",
+                            items:{
+                                type:"string"}
+                        },
+                        val3:{
+                            type:"object",
+                            properties:{
+                                val4:{type:"string",format:"date-time"}  ,
+                                val5:{type:"number"}
+                            }
+                        }
+                    }
+                }
+            ];
+
+            let result={
+                type:"object",
+                properties:{
+                    val1:{type:"string"},
+                    val2:{
+                        type:"array",
+                        items:{
+                            type:"string"}
+                    },
+                    val3:{
+                        type:"object",
+                        properties:{
+                            val4:{type:"string",format:"date-time"}  ,
+                            val5:{type:"number"}
+                        }
+                    }
+                }
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+
+        it('should merge array', function () {
+            let schemas=[
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"},
+                        val2:{
+                            type:"array",
+                            items:{
+                                type:"string"
+                            }
+                        },
+                        val3:{
+                            type:"array",
+                            items:{
+                                type:"array",
+                                items:{
+                                    type:"object",
+                                    properties:{
+                                        valArr1:{type:"string"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    type:"object",
+                    properties:{
+                        val1:{type:"string"},
+                        val2:{
+                            type:"array",
+                            items:{
+                                type:"object",
+                                properties:{
+                                    arrVal1:{type:"number"},
+                                    arrVal2:{type:"boolean"}
+                                }
+                            }
+                        },
+                        val3:{
+                            type:"array",
+                            items:{
+                                type:"array",
+                                items:{
+                                    type:"object",
+                                    properties:{
+                                        valArr2:{type:"integer"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ];
+
+            let result={
+                type:"object",
+                properties:{
+                    val1:{type:"string"},
+                    val2:{
+                        type:"array",
+                        items:{
+                            type:"object",
+                            properties:{
+                                arrVal1:{type:"number"},
+                                arrVal2:{type:"boolean"}
+                            }
+                        }
+                    },
+                    val3:{
+                        type:"array",
+                        items:{
+                            type:"array",
+                            items:{
+                                type:"object",
+                                properties:{
+                                    valArr1:{type:"string"},
+                                    valArr2:{type:"integer"}
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
+
+        });
+        
+    });
+    
 });
