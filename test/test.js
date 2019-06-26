@@ -1,5 +1,6 @@
 const assert = require('assert');
 const SchemaMagic=require('../index');
+const $mongoId=require('bson-objectid');
 
 describe('Schema Magic', function() {
 
@@ -308,6 +309,10 @@ describe('Schema Magic', function() {
             assert.deepEqual(SchemaMagic.generateSchemaFromJSON(new Date()),{type:"string",format:"date-time"},"Invalid schema generate");
             assert.deepEqual(SchemaMagic.generateSchemaFromJSON(1.2),{type:"number"},"Invalid schema generate");
             assert.deepEqual(SchemaMagic.generateSchemaFromJSON(false),{type:"boolean"},"Invalid schema generate");
+        });
+
+        it('generate a schema from mongo', function () {
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON($mongoId()),{type:"string",format:"mongoid"},"Invalid schema generate");
         });
 
         it('generate a complex schema', function () {
