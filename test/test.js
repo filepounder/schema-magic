@@ -315,6 +315,10 @@ describe('Schema Magic', function() {
             assert.deepEqual(SchemaMagic.generateSchemaFromJSON($mongoId()),{type:"string",format:"mongoid"},"Invalid schema generate");
         });
 
+        it('generate a schema with buffer', function () {
+            assert.deepEqual(SchemaMagic.generateSchemaFromJSON(Buffer.from("abc")),{type:"string"},"Invalid schema generate");
+        });
+
         it('generate a complex schema', function () {
             let obj={
                 "id": 2,
