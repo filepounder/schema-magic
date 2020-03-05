@@ -300,7 +300,7 @@ describe('Schema Magic', function() {
     });
 
     describe('JSON Generate', function() {
-        
+
 
         it('generate a simple schema', function () {
             assert.deepEqual(SchemaMagic.generateSchemaFromJSON(null),{type:"null"},"Invalid schema generate");
@@ -711,15 +711,44 @@ describe('Schema Magic', function() {
             assert.deepEqual(SchemaMagic.mergeSchemas(schemas),result,"Invalid schema merge");
 
         });
-        
+
     });
 
     describe('validate', function() {
         it('should throw argument missing when document not specified', function() {
             assert.throws(function(){SchemaMagic.validate(null,null);},Error,"Document Argument Missing Error Not Thrown");
         });
+
         it('should throw argument missing when schema not specified', function() {
             assert.throws(function(){SchemaMagic.validate({},null);},Error.ArgumentMissingError,"Schema Argument Missing Error Not Thrown");
+        });
+
+
+        it('should correctly validate with multiple errors', function() {
+            let multiSchema={
+                type:"object",
+                properties:{
+                    date:{type:"string",format:"date"},
+                    int:{type:"integer"}
+                },
+                required:["date","int"]
+            };
+
+
+            assert.equal(SchemaMagic.validate({
+                date:"2018-01-32",
+                int:"xxx"
+            },multiSchema,false,true).length,2,"Schema not returning multiple errors");
+
+            assert.equal(SchemaMagic.validate({
+                date:"2018-01-30",
+                int:"xxx"
+            },multiSchema,false,true).length,1,"Schema not returning multiple errors");
+
+            assert.equal(SchemaMagic.validate({
+                date:"2018-01-32",
+                int:null
+            },multiSchema,false,true).length,2,"Schema not returning multiple errors");
         });
 
         it('should correctly validate a core json schema', function() {
@@ -792,6 +821,24 @@ describe('Schema Magic', function() {
                     id:{type:"string",format:"mongoid"}
                 }
             }),null,"Mongo ID invalid when it should not be");
+        });
+
+        it('should correctly validate a date', function() {
+            let dateSchema={
+                type:"object",
+                properties:{
+                    date:{type:"string",format:"date"}
+                }
+            };
+
+            assert.notEqual(SchemaMagic.validate({
+                date:"2018-01-32"
+            },dateSchema),null,"Date schema validated when not be");
+
+
+            assert.equal(SchemaMagic.validate({
+                date:"2018-01-31"
+            },dateSchema),null,"Date schema not validated");
         });
 
         it('should correctly validate a email list', function() {
