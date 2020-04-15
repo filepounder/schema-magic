@@ -783,6 +783,118 @@ describe('Schema Magic', function() {
             ],SchemaMagic.coreSchemas.jsonPatch),null,"Schema invalid when it should not be");
         });
 
+
+        it('should validate multiple types', function() {
+            assert.equal(SchemaMagic.validate({
+                val1:"abc"
+            },{
+                type:"object",
+                properties:{
+                    val1:{type:["integer","string","null"]}
+                }
+            }),null,"Schema valid when it should not be");
+
+
+        });
+
+        it('should validate multiple types 2', function() {
+            assert.equal(SchemaMagic.validate({
+                val1:null
+            },{
+                type:"object",
+                properties:{
+                    val1:{type:["integer","string","null"]}
+                }
+            }),null,"Schema valid when it should not be");
+
+
+        });
+
+        it('should validate multiple types with array', function() {
+            assert.equal(SchemaMagic.validate({
+                a:{
+                   b:[
+                       {val1:"abc"}
+                   ]
+                }
+            },{
+                type:"object",
+                properties:{
+                    a:{
+                        type:"object",
+                        properties:{
+                            b:{
+                                type:"array",
+                                items:{
+                                    type:"object",
+                                    properties:{
+                                        val1:{type:["integer","string","null"]}
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }),null,"Schema valid when it should not be");
+        });
+
+        it('should validate multiple types with array', function() {
+            assert.equal(SchemaMagic.validate({
+                a:{
+                    b:[
+                        {val1:"abc"}
+                    ]
+                }
+            },{
+                type:"object",
+                properties:{
+                    a:{
+                        type:"object",
+                        properties:{
+                            b:{
+                                type:"array",
+                                items:{
+                                    type:"object",
+                                    properties:{
+                                        val1:{type:["integer","string","null"]}
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }),null,"Schema valid when it should not be");
+
+            assert.notEqual(SchemaMagic.validate({
+                a:{
+                    b:[
+                        {val1:false}
+                    ]
+                }
+            },{
+                type:"object",
+                properties:{
+                    a:{
+                        type:"object",
+                        properties:{
+                            b:{
+                                type:"array",
+                                items:{
+                                    type:"object",
+                                    properties:{
+                                        val1:{type:["integer","string","null"]}
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }),null,"Schema valid when it should not be");
+        });
+
         it('should correctly validate a schema', function() {
             assert.notEqual(SchemaMagic.validate({
                 val1:"abc"
@@ -1214,6 +1326,24 @@ describe('Schema Magic', function() {
             assert.equal(invalid,null,"invalid");
         });
 
+        it('should validate a schema with parameters with multiple', function() {
+            let invalid=SchemaMagic.validateWithParameters({
+                val1:[{val2:"@test"}],
+            },{ type:"object",
+                properties: {
+                    val1: {
+                        type: "array",
+                        items: {
+                            type: "object", properties: {
+                                val2: {type: ["integer"]}
+                            }
+                        }
+                    }
+                },
+                required:['val1']
+            });
+            assert.equal(invalid,null,"invalid");
+        });
     });
 
     describe('Validator', function() {
