@@ -121,6 +121,47 @@ describe('Schema Magic', function() {
             assert.deepEqual(SchemaMagic.flattenSchema(schema),output,"Invalid flatten")
         });
 
+        it('should flatten a nested schema with properties', function () {
+            let schema={
+                type:"object",
+                properties:{
+                    val1:{type:"integer"},
+                    val2:{
+                        type:"object",
+                        properties:{
+                            "a":{type:"number",displayOptions:{sequence:1}},
+                            b:{type:"string",displayOptions:{sequence:1}}
+                        }
+                    }
+                }
+            };
+
+            let output=[
+                {
+                    path:"val1",
+                    type:"integer",
+                    format:undefined,
+                    isArray:false,
+                    required:false
+                },
+                {
+                    path:"val2.a",
+                    type:"number",
+                    format:undefined,
+                    isArray:false,
+                    required:false,displayOptions:{sequence:1}
+                },
+                {
+                    path:"val2.b",
+                    type:"string",
+                    format:undefined,
+                    isArray:false,
+                    required:false,displayOptions:{sequence:1}
+                }
+            ];
+            assert.deepEqual(SchemaMagic.flattenSchema(schema,{additionalProperties:["displayOptions"]}),output,"Invalid flatten")
+        });
+
         it('should flatten a nested schema with required', function () {
             let schema={
                 type:"object",
