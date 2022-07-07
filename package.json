@@ -14,7 +14,7 @@
     "cron-parser": "2.15.0",
     "clone-deep": "4.0.1",
     "json-magic": "0.0.12",
-    "moment": "2.24.0",
+    "moment": "2.29.4",
     "moment-timezone": "0.5.28",
     "type-magic": "0.0.2",
     "underscore": "1.10.2",
